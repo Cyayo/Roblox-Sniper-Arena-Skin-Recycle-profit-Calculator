@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0b0f19" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="RAP Calc" />
+  <title>RAP Recycle Profit Calculator</title>
+  <link rel="icon" type="image/png" href="rap.png" />
+  <link rel="apple-touch-icon" href="rap.png" />
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    :root {
+      --bg-main: #0b0f19;
+      --bg-card: #151c2e;
+      --bg-input: #0b1120;
+      --border-color: #263352;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-orange: #f97316;
+      --accent-purple: #a855f7;
+      --accent-yellow: #f59e0b;
+      --accent-teal: #2dd4bf;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 16px 12px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 25px rgba(56, 189, 248, 0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Header */
+    .header {
+      padding: 14px 18px;
+      background: linear-gradient(180deg, #1e293b 0%, var(--bg-card) 100%);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header img {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.4));
+    }
+
+    .header-text h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--accent-blue);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .header-text p {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .btn-install-app {
+      display: none;
+      align-items: center;
+      gap: 5px;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 14px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+    }
+
+    /* 3 Navigation Tabs */
+    .tabs-nav {
+      display: flex;
+      background: #0f172a;
+      border-bottom: 1px solid var(--border-color);
+      padding: 6px 8px 0 8px;
+      gap: 4px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px 8px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      border-radius: 8px 8px 0 0;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .tab-btn.active {
+      color: var(--accent-blue);
+      border-bottom: 2px solid var(--accent-blue);
+      background: var(--bg-card);
+    }
+
+    .tab-badge {
+      background: #1e293b;
+      color: #cbd5e1;
+      font-size: 0.68rem;
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-weight: 800;
+    }
+
+    .tab-btn.active .tab-badge {
+      background: rgba(56, 189, 248, 0.2);
+      color: var(--accent-blue);
+    }
+
+    /* Tab Contents */
+    .tab-content {
+      display: none;
+      padding: 16px 18px;
+      flex-direction: column;
+      gap: 13px;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* Form Inputs */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrapper input {
+      width: 100%;
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 55px 10px 14px;
+      color: #fff;
+      font-size: 0.98rem;
+      font-weight: 600;
+      font-family: 'Consolas', 'Courier New', monospace;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .input-wrapper input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+    }
+
+    .input-unit {
+      position: absolute;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .mini-icon {
+      width: 16px;
+      height: 16px;
+      object-fit: contain;
+    }
+
+    /* Quantity Multiplier */
+    .qty-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .qty-btn {
+      flex: 1;
+      padding: 6px 4px;
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .qty-btn:hover {
+      background: #1e293b;
+      color: #fff;
+      border-color: #475569;
+    }
+
+    /* Switch Card for Trade Mode */
+    .switch-card {
+      background: #0d1527;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .switch-card:hover {
+      border-color: var(--accent-orange);
+    }
+
+    .switch-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .switch-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fed7aa;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .switch-explanation {
+      font-size: 0.74rem;
+      color: #94a3b8;
+      line-height: 1.35;
+      padding-top: 4px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.08);
+    }
+
+    .switch-toggle {
+      position: relative;
+      display: inline-block;
+      width: 42px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+
+    .switch-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #334155;
+      transition: 0.3s;
+      border-radius: 22px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--accent-orange);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    /* Breakdown Box */
+    .breakdown-box {
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      color: #cbd5e1;
+    }
+
+    .breakdown-row.highlight {
+      font-weight: 700;
+      padding: 4px 0;
+      border-top: 1px dashed rgba(255, 255, 255, 0.08);
+    }
+
+    .breakdown-val {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .text-red { color: #f87171; }
+    .text-green { color: #34d399; }
+    .text-blue { color: #38bdf8; }
+    .text-orange { color: #fb923c; }
+    .text-yellow { color: #fbbf24; }
+    .text-teal { color: var(--accent-teal); }
+
+    /* Final Estimated Profit Box */
+    .profit-final-box {
+      border-radius: 14px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 3px;
+      transition: all 0.3s ease;
+    }
+
+    .profit-final-box.profit {
+      background: linear-gradient(145deg, #064e3b 0%, #065f46 100%);
+      border: 1px solid #10b981;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+    }
+
+    .profit-final-box.loss {
+      background: linear-gradient(145deg, #7f1d1d 0%, #991b1b 100%);
+      border: 1px solid #ef4444;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.25);
+    }
+
+    .profit-final-box.neutral {
+      background: #1e293b;
+      border: 1px solid #475569;
+    }
+
+    .profit-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .profit.profit-title { color: #a7f3d0; }
+    .loss .profit-title { color: #fecaca; }
+    .neutral .profit-title { color: #94a3b8; }
+
+    .profit-val-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .profit-val-row span {
+      font-size: 1.8rem;
+      font-weight: 900;
+      font-family: 'Consolas', monospace;
+      color: #fff;
+    }
+
+    .profit-val-row img {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+    }
+
+    .profit-meta {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 600;
+    }
+
+    /* Action Buttons */
+    .btn-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 11px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.84rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #1e293b;
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: #334155;
+      color: #fff;
+    }
+
+    /* TAB 2: Target Finder Result Box */
+    .finder-result-box {
+      background: linear-gradient(145deg, #1e1b4b 0%, #2e1065 100%);
+      border: 1px solid var(--accent-purple);
+      box-shadow: 0 4px 20px rgba(168, 85, 247, 0.2);
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .finder-tag {
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: #c084fc;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .finder-main-price {
+      font-size: 1.6rem;
+      font-weight: 900;
+      font-family: 'Consolas', monospace;
+      color: #facc15;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .finder-subtext {
+      font-size: 0.74rem;
+      color: #e9d5ff;
+      line-height: 1.35;
+    }
+
+    /* TAB 3: History & Cumulative Profit */
+    .total-summary-card {
+      background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .total-summary-label strong {
+      display: block;
+      font-size: 0.85rem;
+      color: #a7f3d0;
+    }
+
+    .total-summary-label span {
+      font-size: 0.7rem;
+      color: #94a3b8;
+    }
+
+    .total-summary-val {
+      font-size: 1.3rem;
+      font-weight: 900;
+      font-family: 'Consolas', monospace;
+      color: #34d399;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .history-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 4px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .history-tools {
+      display: flex;
+      gap: 6px;
+    }
+
+    .tool-btn {
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .tool-btn:hover {
+      background: #1e293b;
+      color: #fff;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 380px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .history-card-item {
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .history-card-item:hover {
+      border-color: #38bdf8;
+    }
+
+    .history-summary-row {
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .history-summary-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .history-summary-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .history-summary-sub {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      font-family: 'Consolas', monospace;
+    }
+
+    .history-summary-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .history-profit-badge {
+      font-family: 'Consolas', monospace;
+      font-weight: 800;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-delete-item {
+      background: transparent;
+      border: none;
+      color: #64748b;
+      font-size: 0.85rem;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .btn-delete-item:hover {
+      color: var(--accent-red);
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    /* Accordion Drawer */
+    .history-detail-drawer {
+      display: none;
+      padding: 10px 12px;
+      background: #070d19;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.74rem;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .history-card-item.open .history-detail-drawer {
+      display: flex;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 12px;
+    }
+
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      color: #94a3b8;
+    }
+
+    .detail-item .val {
+      font-family: 'Consolas', monospace;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+
+    .btn-load-calc {
+      margin-top: 4px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: var(--accent-blue);
+      padding: 6px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+
+    .btn-load-calc:hover {
+      background: var(--accent-blue);
+      color: #0b1120;
+    }
+
+    .btn-donate-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 14px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(244, 63, 94, 0.35);
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .btn-donate-badge:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(244, 63, 94, 0.55);
+    }
+
+    /* Modal Backdrop */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #151c2e;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 380px;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(244, 63, 94, 0.15);
+      text-align: center;
+      position: relative;
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 14px; right: 14px;
+      background: transparent;
+      border: none;
+      color: #64748b;
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+    }
+
+    .modal-close-btn:hover {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <img src="rap.png" alt="RAP Coin" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'38\' height=\'38\' viewBox=\'0 0 24 24\' fill=\'%23f59e0b\'><circle cx=\'12\' cy=\'12\' r=\'10\'/><text x=\'12\' y=\'16\' font-size=\'11\' font-weight=\'bold\' text-anchor=\'middle\' fill=\'%23000\'>RAP</text></svg>'" />
+        <div class="header-text">
+          <h1>RAP RECYCLE PROFIT</h1>
+          <p>Offline Profit, Tax & ROI Calculator</p>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <button id="btnDonate" class="btn-donate-badge" onclick="openDonateModal()" title="Support / Donate Robux">
+          💖 Support Me
+        </button>
+        <button id="btnInstallApp" class="btn-install-app" onclick="triggerInstallPrompt()">
+          📱 Install
+        </button>
+      </div>
+    </header>
+
+    <!-- 3 COLUMNS / TABS NAVIGATION -->
+    <nav class="tabs-nav">
+      <button class="tab-btn active" id="tabBtnCalc" onclick="switchTab('calc')">
+        🧮 Calculator
+      </button>
+      <button class="tab-btn" id="tabBtnTarget" onclick="switchTab('target')">
+        🎯 Target Finder
+      </button>
+      <button class="tab-btn" id="tabBtnHistory" onclick="switchTab('history')">
+        📜 History <span class="tab-badge" id="historyBadge">0</span>
+      </button>
+    </nav>
+
+    <!-- ============================================== -->
+    <!-- TAB 1: CALCULATOR                              -->
+    <!-- ============================================== -->
+    <div class="tab-content active" id="tabCalc">
+      
+      <!-- 1. Recycle Price -->
+      <div class="form-group">
+        <label>Recycle Price (Gross Value)</label>
+        <div class="input-wrapper">
+          <input type="text" id="recycleInput" value="15,601" placeholder="e.g. 15,601 or 15.6k" autofocus />
+          <div class="input-unit">
+            <span>RAP</span>
+            <img src="rap.png" class="mini-icon" alt="" onerror="this.style.display='none'" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Buy Price -->
+      <div class="form-group">
+        <label>Buy Price (Cost)</label>
+        <div class="input-wrapper">
+          <input type="text" id="buyInput" value="11,100" placeholder="e.g. 11,100 or 11.1k" />
+          <div class="input-unit">
+            <span>RAP</span>
+            <img src="rap.png" class="mini-icon" alt="" onerror="this.style.display='none'" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Quantity Multiplier -->
+      <div class="form-group">
+        <label>Quantity / Multiplier</label>
+        <div class="input-wrapper">
+          <input type="number" id="qtyInput" value="1" min="1" />
+          <div class="input-unit">
+            <span>Items</span>
+          </div>
+        </div>
+        <div class="qty-row" style="margin-top: 4px;">
+          <button class="qty-btn" type="button" onclick="setQty(1)">1x</button>
+          <button class="qty-btn" type="button" onclick="setQty(16)">16x</button>
+          <button class="qty-btn" type="button" onclick="setQty(32)">32x</button>
+          <button class="qty-btn" type="button" onclick="setQty(64)">64x</button>
+        </div>
+      </div>
+
+      <!-- 4. Trade Mode Toggle -->
+      <div class="switch-card" onclick="toggleTradeMode()">
+        <div class="switch-header-row">
+          <div class="switch-title">
+            <span>🔄 Trade Mode (+5% Tax)</span>
+          </div>
+          <label class="switch-toggle" onclick="event.stopPropagation()">
+            <input type="checkbox" id="tradeToggle" onchange="calculate()" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="switch-explanation">
+          Enable when delegating recycling to another player who trades the RAP back to you (incurs 5% Trade Tax).
+        </div>
+      </div>
+
+      <!-- 5. Step-by-Step Breakdown Card -->
+      <div class="breakdown-box">
+        <div class="breakdown-row">
+          <span>Total Gross Recycle:</span>
+          <div class="breakdown-val"><span id="txtGrossRecycle">15,601 RAP</span> <img src="rap.png" class="mini-icon" alt="" onerror="this.style.display='none'" /></div>
+        </div>
+        <div class="breakdown-row">
+          <span>Recycle Tax (7%):</span>
+          <div class="breakdown-val text-red"><span id="txtRecycleTax">-1,092 RAP (7%)</span> <img src="rap.png" class="mini-icon" alt="" onerror="this.style.display='none'" /></div>
+        </div>
+        <div class="breakdown-row highlight" style="color: var(--accent-teal);">
+          <span id="lblAfterRecycle">➔ Net Cash Received (-7%):</span>
+          <div class="breakdown-val text-teal"><span id="txtAfterRecycleTax">14,509 RAP</span> <img src="rap.png" class="mini-icon" alt="" onerror="this.style.display='none'" /></div>
+        </div>
+        
+        <!-- Trade Tax (Only visible when trade mode is ON) -->
+        <div class="breakdown-row" id="rowTradeTax" style="display: none;">
+          <span>Trade Tax (5%):</span>
+          <div class="breakdown-val text-orange"><span id="txtTradeTax">-0 RAP (5%)</span> <img src="rap.png" class="mini-icon" alt="" onerror="this.style.display='none'" /></div>
+        </div>
+        <div class="breakdown-row highlight" id="rowAfterTradeTax" style="display: none; color: var(--accent-blue);">
+          <span>➔ Final Received (After Trade):</span>
+          <div class="breakdown-val text-blue"><span id="txtAfterTradeTax">0 RAP</span> <img src="rap.png" class="mini-icon" alt="" onerror="this.style.display='none'" /></div>
+        </div>
+
+        <div class="breakdown-row">
+          <span>Total Buy Cost:</span>
+          <div class="breakdown-val text-red"><span id="txtTotalBuy">-11,100 RAP</span> <img src="rap.png" class="mini-icon" alt="" onerror="this.style.display='none'" /></div>
+        </div>
+      </div>
+
+      <!-- 6. Estimated Net Profit Banner -->
+      <div class="profit-final-box profit" id="profitFinalBox">
+        <div class="profit-title" id="profitFinalTitle">🎉 ESTIMATED NET PROFIT</div>
+        <div class="profit-val-row">
+          <span id="profitFinalValue">+3,409</span>
+          <span style="font-size: 1.2rem; color: #fff; font-weight: 800;">RAP</span>
+          <img src="rap.png" alt="" onerror="this.style.display='none'" />
+        </div>
+        <div class="profit-meta" id="profitFinalMeta">Margin: 23% | ROI: 31% (Qty: 1)</div>
+      </div>
+
+      <!-- 7. Break Even (Max Buy) - Positioned below Profit -->
+      <div style="background:#0f172a; border:1px solid var(--border-color); border-radius:10px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="color: #fbbf24; font-size: 0.82rem; font-weight: 700;">⚖️ Break Even (Max Buy):</span>
+        <div class="breakdown-val text-yellow" style="font-size: 0.92rem;"><span id="txtBreakEven">14,509 RAP / item</span> <img src="rap.png" class="mini-icon" alt="" onerror="this.style.display='none'" /></div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="resetForm()">🔄 Reset</button>
+        <button class="btn btn-primary" onclick="saveHistory()">💾 Save to History</button>
+      </div>
+
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 2: TARGET FINDER (Rekomendasi Target Beli) -->
+    <!-- ============================================== -->
+    <div class="tab-content" id="tabTarget">
+      
+      <!-- Item Recycle Price -->
+      <div class="form-group">
+        <label>Item Recycle Price (Gross)</label>
+        <div class="input-wrapper">
+          <input type="text" id="targetRecycleInput" value="15,601" placeholder="e.g. 15,601 or 15.6k" oninput="calculateTargetFinder()" />
+          <div class="input-unit">
+            <span>RAP</span>
+            <img src="rap.png" class="mini-icon" alt="" onerror="this.style.display='none'" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Min & Max Target Profit Columns -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <div class="form-group">
+          <label>Min Target Profit</label>
+          <div class="input-wrapper">
+            <input type="text" id="targetMinInput" value="1,500" placeholder="Min (e.g. 1,500)" oninput="calculateTargetFinder()" />
+            <div class="input-unit" style="font-size:0.7rem;">RAP</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Max Target Profit</label>
+          <div class="input-wrapper">
+            <input type="text" id="targetMaxInput" value="3,000" placeholder="Max (e.g. 3,000)" oninput="calculateTargetFinder()" />
+            <div class="input-unit" style="font-size:0.7rem;">RAP</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Target Profit Quick Presets -->
+      <div class="form-group">
+        <label>Quick Target Presets</label>
+        <div class="qty-row">
+          <button class="qty-btn" type="button" onclick="setTargetPreset('1.5k', '3k')">+1.5k ~ +3k</button>
+          <button class="qty-btn" type="button" onclick="setTargetPreset('3k', '5k')">+3k ~ +5k</button>
+          <button class="qty-btn" type="button" onclick="setTargetPreset('5k', '10k')">+5k ~ +10k</button>
+          <button class="qty-btn" type="button" onclick="setTargetPreset('2k', '')">Fixed +2k</button>
+        </div>
+      </div>
+
+      <!-- Trade Mode Toggle for Finder -->
+      <div class="switch-card" onclick="toggleFinderTradeMode()">
+        <div class="switch-header-row">
+          <div class="switch-title">
+            <span>🔄 Trade Mode (+5% Tax)</span>
+          </div>
+          <label class="switch-toggle" onclick="event.stopPropagation()">
+            <input type="checkbox" id="finderTradeToggle" onchange="calculateTargetFinder()" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="switch-explanation">
+          Calculates buying price recommendations considering 7% Recycle Tax + 5% Trade Tax.
+        </div>
+      </div>
+
+      <!-- 🎯 TARGET BUY RECOMMENDATION RESULT BOX -->
+      <div class="finder-result-box">
+        <div class="finder-tag" id="finderStatusTag">🎯 RECOMMENDED BUY PRICE (RANGE)</div>
+        <div class="finder-main-price">
+          <span id="finderRecommendedPrice">11,509 ~ 13,009</span>
+          <span style="font-size: 1.1rem; color: #fff;">RAP</span>
+          <img src="rap.png" class="mini-icon" style="width: 24px; height: 24px;" alt="" onerror="this.style.display='none'" />
+        </div>
+        <div class="finder-subtext" id="finderSubtext">
+          Buy in this range to guarantee between <strong>+1,500 ~ +3,000 RAP</strong> profit per item!
+        </div>
+      </div>
+
+      <!-- Finder Calculation Summary -->
+      <div class="breakdown-box">
+        <div class="breakdown-row">
+          <span>Recycle Price:</span>
+          <div class="breakdown-val"><span id="txtFinderGross">15,601 RAP</span></div>
+        </div>
+        <div class="breakdown-row">
+          <span>Recycle Tax (7%):</span>
+          <div class="breakdown-val text-red"><span id="txtFinderTax">-1,092 RAP</span></div>
+        </div>
+        <div class="breakdown-row" id="finderTradeRow" style="display: none;">
+          <span>Trade Tax (5%):</span>
+          <div class="breakdown-val text-orange"><span id="txtFinderTradeTax">-725 RAP</span></div>
+        </div>
+        <div class="breakdown-row highlight" style="color: var(--accent-blue);">
+          <span>➔ Net Value Received:</span>
+          <div class="breakdown-val text-blue"><span id="txtFinderNet">14,509 RAP</span></div>
+        </div>
+        <div class="breakdown-row">
+          <span style="color: #fbbf24;">Max Break-Even Price:</span>
+          <div class="breakdown-val text-yellow"><span id="txtFinderBreakEven">14,509 RAP</span></div>
+        </div>
+      </div>
+
+      <!-- Action Button to Load into Calculator -->
+      <button class="btn btn-primary" onclick="applyFinderToCalculator()">
+        🚀 Send to Calculator to Check ROI & Quantity
+      </button>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- TAB 3: HISTORY & SUMMARY                       -->
+    <!-- ============================================== -->
+    <div class="tab-content" id="tabHistory">
+      <!-- Total Cumulative Profit Summary -->
+      <div class="total-summary-card">
+        <div class="total-summary-label">
+          <strong>Total Accumulated Profit</strong>
+          <span id="totalSummaryCount">0 calculations saved</span>
+        </div>
+        <div class="total-summary-val" id="totalProfitSummary">
+          <span>+0 RAP</span>
+          <img src="rap.png" class="mini-icon" alt="" onerror="this.style.display='none'" />
+        </div>
+      </div>
+
+      <!-- History Toolbar -->
+      <div class="history-toolbar">
+        <span>Saved Calculations</span>
+        <div class="history-tools">
+          <button class="tool-btn" onclick="exportHistory()">📥 Export TXT</button>
+          <button class="tool-btn" onclick="clearAllHistory()" style="color: #f87171;">🗑️ Clear All</button>
+        </div>
+      </div>
+
+      <!-- History List Items -->
+      <div class="history-list" id="historyList">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- MODAL: DONATE & SUPPORT CREATOR DIALOG         -->
+    <!-- ============================================== -->
+    <div class="modal-backdrop" id="donateModal" onclick="if(event.target.id==='donateModal') closeDonateModal()">
+      <div class="modal-box">
+        <button class="modal-close-btn" onclick="closeDonateModal()">✕</button>
+        <div style="font-size: 2.2rem; margin-bottom: 6px;">🎁</div>
+        <h2 style="font-size: 1.15rem; color: #f43f5e; margin-bottom: 6px;">Support the Creator</h2>
+        <p style="font-size: 0.8rem; color: #cbd5e1; line-height: 1.4; margin-bottom: 16px;">
+          Enjoying this RAP Profit Calculator? If it helped you make profit in-game, consider supporting the creator! 💖
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <!-- 1. Tako.id Donation Link -->
+          <a href="https://tako.id/Cyayoo" target="_blank" rel="noopener noreferrer" class="btn" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; text-decoration: none; padding: 12px; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35); display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <span>☕ Support via Tako.id (Cyayoo)</span> ➔
+          </a>
+
+          <!-- 2. Roblox Profile (Send Robux) -->
+          <a href="https://www.roblox.com/users/3482568642/profile" target="_blank" rel="noopener noreferrer" class="btn" style="background: linear-gradient(135deg, #e11d48 0%, #be123c 100%); color: white; text-decoration: none; padding: 12px; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(225, 29, 72, 0.35); display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <span>🟥 Give Robux (Roblox Profile)</span> ➔
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const STORAGE_KEY = "rap_recycle_history_v8";
+    let lastCalculation = null;
+    let lastFinderTargetBuy = 0;
+
+    // --- DONATION / SUPPORT MODAL ---
+    function openDonateModal() {
+      document.getElementById('donateModal').classList.add('open');
+    }
+
+    function closeDonateModal() {
+      document.getElementById('donateModal').classList.remove('open');
+    }
+
+    // --- TAB SWITCHING (3 COLUMNS) ---
+    function switchTab(tab) {
+      document.getElementById('tabCalc').classList.toggle('active', tab === 'calc');
+      document.getElementById('tabTarget').classList.toggle('active', tab === 'target');
+      document.getElementById('tabHistory').classList.toggle('active', tab === 'history');
+      
+      document.getElementById('tabBtnCalc').classList.toggle('active', tab === 'calc');
+      document.getElementById('tabBtnTarget').classList.toggle('active', tab === 'target');
+      document.getElementById('tabBtnHistory').classList.toggle('active', tab === 'history');
+
+      if (tab === 'history') {
+        renderHistory();
+      } else if (tab === 'target') {
+        const calcRecycle = document.getElementById('recycleInput').value;
+        if (calcRecycle) document.getElementById('targetRecycleInput').value = calcRecycle;
+        document.getElementById('finderTradeToggle').checked = document.getElementById('tradeToggle').checked;
+        calculateTargetFinder();
+      }
+    }
+
+    function parseNumber(str) {
+      if (!str) return 0;
+      str = String(str).trim().toLowerCase().replace(/\s/g, '');
+      let multiplier = 1;
+      if (str.endsWith('k')) { multiplier = 1000; str = str.slice(0, -1); }
+      else if (str.endsWith('m')) { multiplier = 1000000; str = str.slice(0, -1); }
+      else if (str.endsWith('b')) { multiplier = 1000000000; str = str.slice(0, -1); }
+
+      if (str.includes('.') && str.includes(',')) {
+        if (str.lastIndexOf(',') > str.lastIndexOf('.')) {
+          str = str.replace(/\./g, '').replace(',', '.');
+        } else {
+          str = str.replace(/,/g, '');
+        }
+      } else if (str.includes(',')) {
+        let parts = str.split(',');
+        if (parts.length === 2 && parts[1].length !== 3) str = str.replace(',', '.');
+        else str = str.replace(/,/g, '');
+      } else if (str.includes('.')) {
+        let parts = str.split('.');
+        if (parts.length > 1 && parts.slice(1).every(p => p.length === 3)) str = str.replace(/\./g, '');
+      }
+
+      const num = parseFloat(str);
+      return isNaN(num) ? 0 : num * multiplier;
+    }
+
+    function formatNumber(num) {
+      const rounded = Math.round(num || 0);
+      return rounded.toLocaleString('en-US');
+    }
+
+    function setQty(val) {
+      document.getElementById('qtyInput').value = val;
+      calculate();
+    }
+
+    function toggleTradeMode() {
+      const chk = document.getElementById('tradeToggle');
+      chk.checked = !chk.checked;
+      calculate();
+    }
+
+    function toggleFinderTradeMode() {
+      const chk = document.getElementById('finderTradeToggle');
+      chk.checked = !chk.checked;
+      calculateTargetFinder();
+    }
+
+    function resetForm() {
+      document.getElementById('recycleInput').value = '';
+      document.getElementById('buyInput').value = '';
+      document.getElementById('qtyInput').value = '1';
+      document.getElementById('tradeToggle').checked = false;
+      calculate();
+    }
+
+    // --- TAB 1: CALCULATOR LOGIC ---
+    function calculate() {
+      const recyclePrice = parseNumber(document.getElementById('recycleInput').value);
+      const buyPrice = parseNumber(document.getElementById('buyInput').value);
+      const qty = Math.max(1, parseNumber(document.getElementById('qtyInput').value));
+      const isTrade = document.getElementById('tradeToggle').checked;
+
+      const tradeSection = document.getElementById('rowTradeTax');
+      const rowAfterTradeTax = document.getElementById('rowAfterTradeTax');
+      const lblAfterRecycle = document.getElementById('lblAfterRecycle');
+
+      if (isTrade) {
+        tradeSection.style.display = 'flex';
+        rowAfterTradeTax.style.display = 'flex';
+        lblAfterRecycle.textContent = '➔ After Recycle Tax (-7%):';
+      } else {
+        tradeSection.style.display = 'none';
+        rowAfterTradeTax.style.display = 'none';
+        lblAfterRecycle.textContent = '➔ Net Cash Received (-7%):';
+      }
+
+      const totalGrossRecycle = recyclePrice * qty;
+      const totalBuyPrice = buyPrice * qty;
+
+      const taxRecycleAmount = totalGrossRecycle * 0.07;
+      const afterRecycleTax = totalGrossRecycle - taxRecycleAmount;
+
+      let taxTradeAmount = 0;
+      let afterTradeTax = afterRecycleTax;
+      if (isTrade) {
+        taxTradeAmount = afterRecycleTax * 0.05;
+        afterTradeTax = afterRecycleTax - taxTradeAmount;
+      }
+
+      const netRecycleReceived = afterTradeTax;
+      const profit = netRecycleReceived - totalBuyPrice;
+      const marginPct = netRecycleReceived > 0 ? Math.round((profit / netRecycleReceived) * 100) : 0;
+      const roiPct = totalBuyPrice > 0 ? Math.round((profit / totalBuyPrice) * 100) : 0;
+      const breakEvenPerItem = qty > 0 ? (netRecycleReceived / qty) : 0;
+
+      document.getElementById('txtGrossRecycle').textContent = formatNumber(totalGrossRecycle) + ' RAP';
+      document.getElementById('txtRecycleTax').textContent = '-' + formatNumber(taxRecycleAmount) + ' RAP (7%)';
+      document.getElementById('txtAfterRecycleTax').textContent = formatNumber(afterRecycleTax) + ' RAP';
+
+      if (isTrade) {
+        document.getElementById('txtTradeTax').textContent = '-' + formatNumber(taxTradeAmount) + ' RAP (5%)';
+        document.getElementById('txtAfterTradeTax').textContent = formatNumber(afterTradeTax) + ' RAP';
+      }
+
+      document.getElementById('txtTotalBuy').textContent = (buyPrice === 0 && recyclePrice > 0) 
+        ? '0 RAP (Enter Buy Price)' 
+        : '-' + formatNumber(totalBuyPrice) + ' RAP';
+      document.getElementById('txtBreakEven').textContent = formatNumber(breakEvenPerItem) + ' RAP / item';
+
+      const profitBox = document.getElementById('profitFinalBox');
+      const profitTitle = document.getElementById('profitFinalTitle');
+      const profitVal = document.getElementById('profitFinalValue');
+      const profitMeta = document.getElementById('profitFinalMeta');
+
+      if (buyPrice === 0 && recyclePrice === 0) {
+        profitBox.className = 'profit-final-box neutral';
+        profitTitle.textContent = '⚖️ IMPAS (BREAK EVEN)';
+        profitVal.textContent = '0';
+        profitMeta.textContent = 'Tidak ada untung maupun rugi';
+      } else if (profit > 0) {
+        profitBox.className = 'profit-final-box profit';
+        profitTitle.textContent = '🎉 ESTIMATED NET PROFIT';
+        profitVal.textContent = '+' + formatNumber(profit);
+        profitMeta.textContent = `Margin: ${marginPct}% | ROI: ${roiPct}% (Qty: ${Math.round(qty)})`;
+      } else if (profit < 0) {
+        profitBox.className = 'profit-final-box loss';
+        profitTitle.textContent = '⚠️ ESTIMATED NET LOSS';
+        profitVal.textContent = formatNumber(profit);
+        profitMeta.textContent = `Loss: ${Math.abs(roiPct)}% below cost (Qty: ${Math.round(qty)})`;
+      } else {
+        profitBox.className = 'profit-final-box neutral';
+        profitTitle.textContent = '⚖️ IMPAS (BREAK EVEN)';
+        profitVal.textContent = '0';
+        profitMeta.textContent = 'Tidak ada untung maupun rugi';
+      }
+
+      lastCalculation = {
+        id: Date.now(),
+        recyclePrice: Math.round(recyclePrice),
+        buyPrice: Math.round(buyPrice),
+        qty: Math.round(qty),
+        isTrade,
+        profit: Math.round(profit),
+        roiPct,
+        afterRecycleTax: Math.round(afterRecycleTax),
+        afterTradeTax: Math.round(afterTradeTax),
+        netRecycleReceived: Math.round(netRecycleReceived),
+        totalBuyPrice: Math.round(totalBuyPrice),
+        totalGrossRecycle: Math.round(totalGrossRecycle),
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      };
+    }
+
+    // --- TAB 2: TARGET FINDER LOGIC ---
+    function setTargetPreset(minVal, maxVal) {
+      document.getElementById('targetMinInput').value = minVal;
+      document.getElementById('targetMaxInput').value = maxVal;
+      calculateTargetFinder();
+    }
+
+    function calculateTargetFinder() {
+      const recyclePrice = parseNumber(document.getElementById('targetRecycleInput').value);
+      const minTarget = parseNumber(document.getElementById('targetMinInput').value);
+      const maxTarget = parseNumber(document.getElementById('targetMaxInput').value);
+      const isTrade = document.getElementById('finderTradeToggle').checked;
+
+      const recycleTax = recyclePrice * 0.07;
+      const afterRecycle = recyclePrice - recycleTax;
+      let tradeTax = 0;
+      let netReceived = afterRecycle;
+      if (isTrade) {
+        tradeTax = afterRecycle * 0.05;
+        netReceived = afterRecycle - tradeTax;
+      }
+
+      document.getElementById('txtFinderGross').textContent = formatNumber(recyclePrice) + ' RAP';
+      document.getElementById('txtFinderTax').textContent = '-' + formatNumber(recycleTax) + ' RAP (7%)';
+      document.getElementById('txtFinderNet').textContent = formatNumber(netReceived) + ' RAP';
+      document.getElementById('txtFinderBreakEven').textContent = formatNumber(netReceived) + ' RAP';
+
+      const tradeRow = document.getElementById('finderTradeRow');
+      if (isTrade) {
+        tradeRow.style.display = 'flex';
+        document.getElementById('txtFinderTradeTax').textContent = '-' + formatNumber(tradeTax) + ' RAP (5%)';
+      } else {
+        tradeRow.style.display = 'none';
+      }
+
+      const statusTag = document.getElementById('finderStatusTag');
+      const priceDisplay = document.getElementById('finderRecommendedPrice');
+      const subtext = document.getElementById('finderSubtext');
+
+      if (minTarget > 0 && maxTarget > 0) {
+        const lowerTarget = Math.min(minTarget, maxTarget);
+        const higherTarget = Math.max(minTarget, maxTarget);
+
+        const buyForMaxProfit = Math.max(0, Math.round(netReceived - higherTarget));
+        const buyForMinProfit = Math.max(0, Math.round(netReceived - lowerTarget));
+
+        statusTag.textContent = '🎯 RECOMMENDED BUY PRICE (RANGE)';
+        priceDisplay.textContent = `${formatNumber(buyForMaxProfit)} ~ ${formatNumber(buyForMinProfit)}`;
+        subtext.innerHTML = `Buy in this range to guarantee between <strong>+${formatNumber(lowerTarget)} ~ +${formatNumber(higherTarget)} RAP</strong> profit per item!`;
+        lastFinderTargetBuy = buyForMinProfit;
+
+      } else if (minTarget > 0 && maxTarget === 0) {
+        const maxBuyPrice = Math.max(0, Math.round(netReceived - minTarget));
+        statusTag.textContent = '🎯 MAXIMUM BUY PRICE (FIXED)';
+        priceDisplay.textContent = `Max: ${formatNumber(maxBuyPrice)}`;
+        subtext.innerHTML = `Buy at <strong>${formatNumber(maxBuyPrice)} RAP</strong> or lower to earn at least <strong>+${formatNumber(minTarget)} RAP</strong> profit!`;
+        lastFinderTargetBuy = maxBuyPrice;
+
+      } else if (maxTarget > 0 && minTarget === 0) {
+        const exactBuyPrice = Math.max(0, Math.round(netReceived - maxTarget));
+        statusTag.textContent = '🎯 TARGET BUY PRICE (FIXED)';
+        priceDisplay.textContent = `${formatNumber(exactBuyPrice)}`;
+        subtext.innerHTML = `Buy at <strong>${formatNumber(exactBuyPrice)} RAP</strong> to achieve <strong>+${formatNumber(maxTarget)} RAP</strong> target profit!`;
+        lastFinderTargetBuy = exactBuyPrice;
+
+      } else {
+        statusTag.textContent = '⚖️ BREAK-EVEN BUY PRICE (0% PROFIT)';
+        priceDisplay.textContent = `${formatNumber(netReceived)}`;
+        subtext.innerHTML = `Enter your Min and/or Max profit targets above to see buying recommendations.`;
+        lastFinderTargetBuy = Math.round(netReceived);
+      }
+    }
+
+    function applyFinderToCalculator() {
+      const recyclePrice = parseNumber(document.getElementById('targetRecycleInput').value);
+      const isTrade = document.getElementById('finderTradeToggle').checked;
+
+      document.getElementById('recycleInput').value = formatNumber(recyclePrice);
+      document.getElementById('buyInput').value = formatNumber(lastFinderTargetBuy);
+      document.getElementById('qtyInput').value = 1;
+      document.getElementById('tradeToggle').checked = isTrade;
+      
+      calculate();
+      switchTab('calc');
+    }
+
+    // --- TAB 3: HISTORY MANAGEMENT ---
+    function getStoredHistory() {
+      try {
+        const data = localStorage.getItem(STORAGE_KEY);
+        return data ? JSON.parse(data) : [];
+      } catch(e) {
+        return [];
+      }
+    }
+
+    function updateBadge() {
+      const history = getStoredHistory();
+      document.getElementById('historyBadge').textContent = history.length;
+    }
+
+    function saveHistory() {
+      if (!lastCalculation || (lastCalculation.recyclePrice === 0 && lastCalculation.buyPrice === 0)) return;
+      const history = getStoredHistory();
+      history.unshift(lastCalculation);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+      } catch(e) {}
+      updateBadge();
+      
+      const btn = event.target;
+      const orig = btn.innerHTML;
+      btn.innerHTML = `✅ Saved!`;
+      setTimeout(() => { btn.innerHTML = orig; }, 1000);
+    }
+
+    function deleteHistoryItem(id, event) {
+      if (event) event.stopPropagation();
+      let history = getStoredHistory();
+      history = history.filter(item => item.id !== id);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+      } catch(e) {}
+      updateBadge();
+      renderHistory();
+    }
+
+    function toggleAccordion(cardEl) {
+      cardEl.classList.toggle('open');
+    }
+
+    function loadItemToCalc(itemJsonStr, event) {
+      if (event) event.stopPropagation();
+      const item = JSON.parse(decodeURIComponent(itemJsonStr));
+      document.getElementById('recycleInput').value = item.recyclePrice;
+      document.getElementById('buyInput').value = item.buyPrice;
+      document.getElementById('qtyInput').value = item.qty;
+      document.getElementById('tradeToggle').checked = !!item.isTrade;
+      calculate();
+      switchTab('calc');
+    }
+
+    function clearAllHistory() {
+      if (confirm(`Clear all calculation history records?`)) {
+        localStorage.removeItem(STORAGE_KEY);
+        updateBadge();
+        renderHistory();
+      }
+    }
+
+    function renderHistory() {
+      const historyList = document.getElementById('historyList');
+      const totalSummaryEl = document.getElementById('totalProfitSummary');
+      const countEl = document.getElementById('totalSummaryCount');
+      const history = getStoredHistory();
+
+      updateBadge();
+
+      let totalAccumulatedProfit = 0;
+      history.forEach(item => {
+        totalAccumulatedProfit += (item.profit || 0);
+      });
+
+      countEl.textContent = `${history.length} calculations saved`;
+      const signTotal = totalAccumulatedProfit >= 0 ? '+' : '';
+      const colorTotal = totalAccumulatedProfit > 0 ? '#34d399' : (totalAccumulatedProfit < 0 ? '#f87171' : '#f1f5f9');
+      
+      totalSummaryEl.innerHTML = `
+        <span style="color: ${colorTotal}">${signTotal}${formatNumber(totalAccumulatedProfit)} RAP</span>
+        <img src="rap.png" class="mini-icon" alt="" onerror="this.style.display='none'" />
+      `;
+
+      if (history.length === 0) {
+        historyList.innerHTML = `<div class="empty-history">No calculations saved yet.<br><span style="font-size:0.75rem; color:#475569;">Save your calculations in the Calculator tab.</span></div>`;
+        return;
+      }
+
+      historyList.innerHTML = '';
+      history.forEach((item) => {
+        const div = document.createElement('div');
+        div.className = 'history-card-item';
+        const tag = item.isTrade ? '<span style="color:#fb923c;">[Trade]</span>' : '<span style="color:#38bdf8;">[Normal]</span>';
+        const sign = item.profit >= 0 ? '+' : '';
+        const color = item.profit >= 0 ? '#34d399' : '#f87171';
+        const encodedItem = encodeURIComponent(JSON.stringify(item));
+
+        div.innerHTML = `
+          <div class="history-summary-row" onclick="toggleAccordion(this.parentElement)">
+            <div class="history-summary-left">
+              <div class="history-summary-title">
+                ${tag} <span>${item.qty}x Items</span>
+              </div>
+              <div class="history-summary-sub">
+                🕒 ${item.time || '-'} • Cost: ${formatNumber(item.buyPrice)} → Rec: ${formatNumber(item.recyclePrice)}
+              </div>
+            </div>
+            <div class="history-summary-right">
+              <div class="history-profit-badge" style="color: ${color}">
+                <span>${sign}${formatNumber(item.profit)}</span>
+                <img src="rap.png" class="mini-icon" alt="" onerror="this.style.display='none'" />
+              </div>
+              <button class="btn-delete-item" title="Delete this record" onclick="deleteHistoryItem(${item.id}, event)">✕</button>
+            </div>
+          </div>
+          
+          <!-- Dropdown Details -->
+          <div class="history-detail-drawer">
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="title">Buy Cost / item:</span>
+                <span class="val" style="color:#f472b6;">${formatNumber(item.buyPrice)} RAP</span>
+              </div>
+              <div class="detail-item">
+                <span class="title">Recycle Price / item:</span>
+                <span class="val" style="color:#38bdf8;">${formatNumber(item.recyclePrice)} RAP</span>
+              </div>
+              <div class="detail-item">
+                <span class="title">After Recycle Tax (-7%):</span>
+                <span class="val" style="color:var(--accent-teal);">${formatNumber(item.afterRecycleTax || (item.totalGrossRecycle * 0.93))} RAP</span>
+              </div>
+              <div class="detail-item">
+                <span class="title">After Trade Tax (-5%):</span>
+                <span class="val" style="color:var(--accent-blue);">${formatNumber(item.afterTradeTax || item.netRecycleReceived)} RAP</span>
+              </div>
+              <div class="detail-item">
+                <span class="title">Total Cost (${item.qty}x):</span>
+                <span class="val">${formatNumber(item.totalBuyPrice)} RAP</span>
+              </div>
+              <div class="detail-item">
+                <span class="title">Final Net Received:</span>
+                <span class="val" style="color:#34d399;">${formatNumber(item.netRecycleReceived)} RAP</span>
+              </div>
+            </div>
+            <button class="btn-load-calc" onclick="loadItemToCalc('${encodedItem}', event)">
+              🔄 Load into Calculator
+            </button>
+          </div>
+        `;
+        historyList.appendChild(div);
+      });
+    }
+
+    function exportHistory() {
+      const history = getStoredHistory();
+      if (history.length === 0) {
+        alert(`No history records to export!`);
+        return;
+      }
+      let totalProfit = 0;
+      let content = `=== RAP RECYCLE PROFIT HISTORY ===\n\n`;
+      history.forEach((item, idx) => {
+        totalProfit += item.profit;
+        const mode = item.isTrade ? "Trade (7% + 5% Tax)" : "Normal (7% Tax)";
+        const sign = item.profit >= 0 ? "+" : "";
+        content += `#${idx+1} [${item.time || '-'}] Mode: ${mode}\n`;
+        content += `   Qty: ${item.qty}x | Cost/Item: ${formatNumber(item.buyPrice)} RAP | Recycle/Item: ${formatNumber(item.recyclePrice)} RAP\n`;
+        content += `   After Recycle Tax (-7%): ${formatNumber(item.afterRecycleTax || (item.totalGrossRecycle * 0.93))} RAP\n`;
+        if (item.isTrade) {
+          content += `   After Trade Tax (-5%): ${formatNumber(item.afterTradeTax || item.netRecycleReceived)} RAP\n`;
+        }
+        content += `   Total Cost: ${formatNumber(item.totalBuyPrice)} RAP | Total Net Received: ${formatNumber(item.netRecycleReceived)} RAP\n`;
+        content += `   PROFIT/LOSS: ${sign}${formatNumber(item.profit)} RAP (ROI: ${item.roiPct}%)\n`;
+        content += `------------------------------------------------------------\n`;
+      });
+      content += `\n>>> TOTAL ACCUMULATED PROFIT: ${totalProfit >= 0 ? '+' : ''}${formatNumber(totalProfit)} RAP <<<\n`;
+
+      const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `rap_profit_history.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // --- PWA INSTALLATION ---
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const btn = document.getElementById('btnInstallApp');
+      if (btn) btn.style.display = 'flex';
+    });
+
+    function triggerInstallPrompt() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+      } else {
+        alert('To install on Mobile:\n1. Tap browser menu (⋮ or Share icon)\n2. Select "Add to Home screen" or "Install App"');
+      }
+    }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+
+    // Event listeners
+    document.getElementById('recycleInput').addEventListener('input', calculate);
+    document.getElementById('buyInput').addEventListener('input', calculate);
+    document.getElementById('qtyInput').addEventListener('input', calculate);
+
+    // Initial load
+    updateBadge();
+    calculate();
+    calculateTargetFinder();
+  </script>
+</body>
+</html>
